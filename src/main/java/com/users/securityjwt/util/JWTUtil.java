@@ -15,6 +15,10 @@ import io.jsonwebtoken.SignatureAlgorithm;
 public class JWTUtil {
 
 	private String SECRET_KEY = "secret";
+	
+	public String extractUserName(String token) {
+		return Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token).getBody().getSubject();
+	}
 
 	public String generateToken(UserDetails userDetails) {
 		Map<String, Object> claims = new HashMap<>();
@@ -28,7 +32,7 @@ public class JWTUtil {
 		Claims claims = Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token).getBody();
 		Date expiryDate = claims.getExpiration();
 		String username = claims.getSubject();
-		if (userDetails.getUsername().equals(username) && expiryDate.before(new Date())) {
+		if (userDetails.getUsername().equals(username) && (new Date().before(expiryDate))) {
 			return true;
 		}
 		return false;
